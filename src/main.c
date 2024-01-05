@@ -104,7 +104,7 @@ int main()
 
         // Delete
         case 6:
-          hapusData(pesanan, jumlahData);
+          hapusData(pesanan, &jumlahData);
           system("pause");
           system("cls");
           break;

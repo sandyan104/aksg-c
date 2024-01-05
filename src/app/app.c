@@ -20,14 +20,46 @@ char pil[1];
 //   }
 // }
 
+int isValidDate(const char *date)
+{
+  int year, month, day;
+  if (sscanf(date, "%d/%d/%d", &year, &month, &day) != 3)
+  {
+    // Jika tidak dapat membaca tiga angka, input tidak valid
+    return 0;
+  }
+
+  // Validasi tahun, bulan, dan hari
+  if (year < 0 || month < 1 || month > 12 || day < 1 || day > 31)
+  {
+    return 0; // Tanggal tidak valid
+  }
+
+  // Tambahan: Validasi bulan dengan jumlah hari yang benar
+  if (month == 2 && (day > 29 || (day == 29 && (year % 4 != 0 || (year % 100 == 0 && year % 400 != 0)))))
+  {
+    return 0; // Februari tidak boleh lebih dari 29 hari (khususnya jika bukan tahun kabisat)
+  }
+  if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 30)
+  {
+    return 0; // Bulan yang memiliki 30 hari tidak boleh lebih dari 30 hari
+  }
+
+  return 1; // Tanggal valid
+}
+
 // Fungsi untuk menginput data pemesanan
 void inputData(struct Pemesanan pesanan[], int *jumlahData)
 {
+  int jmlData;
   printf("Masukkan jumlah data pemesanan: ");
-  scanf("%d", jumlahData);
+  scanf("%d", &jmlData);
+
+  *jumlahData = jmlData;
 
   for (int i = 0; i < *jumlahData; ++i)
   {
+    back :
     printf("\nData Pemesanan ke-%d\n", i + 1);
     printf("Tanggal Pemesanan (format: YYYY/MM/DD): ");
     scanf("%s", pesanan[i].tanggalPemesanan);
@@ -40,6 +72,11 @@ void inputData(struct Pemesanan pesanan[], int *jumlahData)
 
     printf("Tanggal Pemakaian (format: YYYY/MM/DD): ");
     scanf("%s", pesanan[i].tanggalPemakaian);
+
+    if(!isValidDate(pesanan[i].tanggalPemesanan) || !isValidDate(pesanan[i].tanggalPemakaian)){
+      printf("\nTerdapat input tanggal yang tidak sesuai, silahkan ulangi\n");
+      goto back;
+    }
   }
 }
 
@@ -109,15 +146,18 @@ void hapusData(struct Pemesanan pesanan[], int *jumlahData)
     printf("Nomor data tidak valid.\n");
     return;
   }
-
-  // Memindahkan data pada indeks yang dihapus
-  for (int i = nomorData - 1; i < *jumlahData - 1; ++i)
+  else
   {
-    pesanan[i] = pesanan[i + 1];
-  }
 
-  // Mengurangi jumlah data
-  (*jumlahData)--;
+    // Memindahkan data pada indeks yang dihapus
+    for (int i = nomorData - 1; i < *jumlahData - 1; ++i)
+    {
+      pesanan[i] = pesanan[i + 1];
+    }
+
+    // Mengurangi jumlah data
+    (*jumlahData)--;
+  }
 }
 
 // Fungsi untuk mengonversi format tanggal ke format yang dapat dibandingkan
